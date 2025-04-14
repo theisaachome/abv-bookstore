@@ -52,14 +52,24 @@ const data = {
       icon: ListIcon,
     },
     {
-      title: "Analytics",
-      url: "/dashboard/analytics",
+      title: "Invoices",
+      url: "/dashboard/invoices",
       icon: BarChartIcon,
     },
     {
       title: "Books",
       url: "/dashboard/books",
       icon: BookTextIcon,
+    },
+    {
+      title: "Categories",
+      url: "/dashboard/category",
+      icon: FolderIcon,
+    },
+    {
+      title: "Authors",
+      url: "/dashboard/authors",
+      icon: UsersIcon,
     },
     {
       title: "Team",

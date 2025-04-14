@@ -1,11 +1,13 @@
+import { categoriesColumns } from "@/components/category/columns";
+import { CategoryDataTable } from "@/components/category/data-table";
 import { createClient } from "@/utils/supabase/server";
 
 export default async function Category(){
      const supabase =await createClient();
-        const { data: categories} = await supabase.from("category").select();
+        const { data: categories} = await supabase.from("categories").select();
     return (
-        <>
-            {categories?.map((cat)=>(<p key={cat.id}>{cat.name}</p>))}
-        </>
+      <div className="container mx-auto py-10">
+        <CategoryDataTable columns={categoriesColumns} data={categories || []} />
+      </div>
     );
 }
