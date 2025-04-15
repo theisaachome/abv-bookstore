@@ -1,12 +1,15 @@
+import AuthorsTable from "@/components/authors/table";
+import { SkeletonTableBasic } from "@/components/skeletons";
 import { createClient } from "@/utils/supabase/server";
+import { Suspense } from "react";
 
 
 export default async function AuthorPage(){
-         const supabase =await createClient();
-            const { data: authors} = await supabase.from("authors").select();
     return (
-        <>
-        {authors?.map((author)=>(<p className="px-3" key={author.id}>{author.name}</p>))}
-        </>
+        <div className="w-full">
+            <Suspense fallback={<SkeletonTableBasic/>}>
+                <AuthorsTable />
+            </Suspense>
+        </div>
     );
 }
