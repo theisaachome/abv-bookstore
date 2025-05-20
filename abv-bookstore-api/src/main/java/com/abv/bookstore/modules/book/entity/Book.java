@@ -1,12 +1,12 @@
 package com.abv.bookstore.modules.book.entity;
-
 import com.abv.bookstore.common.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -14,6 +14,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "books")
 public class Book extends BaseEntity {

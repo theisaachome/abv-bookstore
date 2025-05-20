@@ -1,5 +1,4 @@
 package com.abv.bookstore.modules.book.dto;
-
 import java.math.BigDecimal;
 
 public record BookRequest(
