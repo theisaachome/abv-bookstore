@@ -1,5 +1,6 @@
 package com.abv.bookstore.common.service;
 
+import com.abv.bookstore.common.exception.ResourceNotFoundException;
 import com.abv.bookstore.common.mapper.BaseMapper;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -28,13 +29,15 @@ public class BaseServiceImpl <Req,Res,ID,Entity> implements BaseService<Req,Res,
 
     @Override
     public Res findById(ID id) {
-        var entity = repository.findById(id).orElseThrow(null);
+        var entity = repository.findById(id).orElseThrow(
+                ()-> new ResourceNotFoundException("Resource","ID", (Long) id));
         return baseMapper.mapToResponseDTO(entity);
     }
 
     @Override
     public Res update(ID id, Req request) {
-        var entity = repository.findById(id).orElseThrow(null);
+        var entity = repository.findById(id).orElseThrow(
+                ()-> new ResourceNotFoundException("Resource","ID", (Long) id));
         baseMapper.updateEntity(request, entity);
         return baseMapper.mapToResponseDTO(repository.save(entity));
     }
