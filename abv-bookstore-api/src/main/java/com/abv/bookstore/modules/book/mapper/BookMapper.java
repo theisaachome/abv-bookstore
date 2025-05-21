@@ -2,6 +2,7 @@ package com.abv.bookstore.modules.book.mapper;
 
 import com.abv.bookstore.common.mapper.BaseMapper;
 import com.abv.bookstore.common.util.SkuGenerator;
+import com.abv.bookstore.common.util.SlugGenerator;
 import com.abv.bookstore.modules.book.dto.BookRequest;
 import com.abv.bookstore.modules.book.dto.BookResponse;
 import com.abv.bookstore.modules.book.entity.Book;
@@ -18,9 +19,12 @@ public class BookMapper implements BaseMapper<BookRequest, BookResponse, Book> {
     @Override
     public Book mapToEntity(BookRequest request) {
         var book = new Book();
+        book.setTitle(request.title());
+        book.setSlug(SlugGenerator.toSlug(request.title()));
+        book.setDescription(request.description());
+        book.setLongDescription(request.longDescription());
         book.setAuthor(request.author());
         book.setSku(SkuGenerator.generateSku());
-        book.setTitle(request.title());
         book.setPublisher("AVG");
         book.setIsbn(request.isbn());
         return book;
@@ -28,7 +32,7 @@ public class BookMapper implements BaseMapper<BookRequest, BookResponse, Book> {
 
     @Override
     public BookResponse mapToResponseDTO(Book book) {
-        return null;
+        return new BookResponse(book.getId(), book.getTitle(), book.getDescription()) ;
     }
 
     @Override

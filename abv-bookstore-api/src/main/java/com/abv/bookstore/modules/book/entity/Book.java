@@ -23,6 +23,14 @@ public class Book extends BaseEntity {
     @Column(nullable = false, length = 255)
     private String title;
 
+    @Column(nullable = false, length = 255)
+    private String slug;
+
+    @Column(nullable = false,columnDefinition = "TEXT")
+    private String description;
+    @Column(columnDefinition = "TEXT")
+    private String longDescription;
+
     @Column( length = 255)
     private String publisher;
 

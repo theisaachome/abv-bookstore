@@ -9,6 +9,14 @@ public record BookRequest(
         @NotBlank(message = "Author is required")
         String author,
 
+
+        @NotNull(message = "Book Description is required")
+        @NotBlank(message = "Description is required")
+        @Size(max = 1000)
+        String description,
+
+        String longDescription,
+
         @Pattern(regexp = "\\d{13}", message = "ISBN must be a 13-digit number")
         String isbn,
 
