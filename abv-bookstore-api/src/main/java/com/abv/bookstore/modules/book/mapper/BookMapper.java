@@ -5,6 +5,7 @@ import com.abv.bookstore.common.util.SkuGenerator;
 import com.abv.bookstore.common.util.SlugGenerator;
 import com.abv.bookstore.modules.book.dto.BookRequest;
 import com.abv.bookstore.modules.book.dto.BookResponse;
+import com.abv.bookstore.modules.book.dto.SellerBookDTO;
 import com.abv.bookstore.modules.book.entity.Book;
 import com.abv.bookstore.modules.book.entity.BookPrice;
 import org.springframework.stereotype.Component;
@@ -38,5 +39,9 @@ public class BookMapper implements BaseMapper<BookRequest, BookResponse, Book> {
     @Override
     public void updateEntity(BookRequest request, Book book) {
 
+    }
+
+    public SellerBookDTO mapToSellerBookDTO(Book book) {
+        return new SellerBookDTO(book.getId(), book.getTitle(), book.getSku(), book.getAuthor(), book.getIsbn(),null,1,"");
     }
 }

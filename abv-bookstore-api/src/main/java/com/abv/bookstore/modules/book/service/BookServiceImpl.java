@@ -8,6 +8,7 @@ import com.abv.bookstore.common.service.BaseServiceImpl;
 import com.abv.bookstore.modules.book.dto.BookFilter;
 import com.abv.bookstore.modules.book.dto.BookRequest;
 import com.abv.bookstore.modules.book.dto.BookResponse;
+import com.abv.bookstore.modules.book.dto.SellerBookDTO;
 import com.abv.bookstore.modules.book.entity.Book;
 import com.abv.bookstore.modules.book.mapper.BookMapper;
 import com.abv.bookstore.modules.book.repo.BookRepository;
@@ -27,11 +28,12 @@ public class BookServiceImpl extends BaseServiceImpl<BookRequest,BookResponse,Lo
         implements BookService{
 
     private final StockMovementRepository stockMovementRepository;
+    private final BookMapper bookMapper;
 
-    public BookServiceImpl(BookRepository repository, BookMapper mapper, StockMovementRepository stockMovementRepository) {
+    public BookServiceImpl(BookRepository repository, BookMapper mapper, StockMovementRepository stockMovementRepository, BookMapper bookMapper) {
         super(repository,mapper,Book.class,BookResponse.class);
         this.stockMovementRepository = stockMovementRepository;
-
+        this.bookMapper = bookMapper;
     }
 
     @Transactional
@@ -83,5 +85,20 @@ public class BookServiceImpl extends BaseServiceImpl<BookRequest,BookResponse,Lo
         }
         var bookPages =  repository.findAll(specification,pageable);
         return bookPages.map(base -> baseMapper.mapToResponseDTO(base));
+    }
+
+    @Override
+    public Page<SellerBookDTO> searchBooks(String query, Pageable pageable) {
+
+        // filter build-up
+        BaseSpecification<Book> spec = new BaseSpecification<>();
+        if(query != null && !query.isBlank()){
+            spec.add(new SearchCriteria("title",query, SearchOperation.OR));
+            spec.add(new SearchCriteria("sku",query, SearchOperation.OR));
+            spec.add(new SearchCriteria("author",query, SearchOperation.OR));
+        }
+
+        var bookPages = repository.findAll(spec,pageable);
+        return bookPages.map(bookMapper::mapToSellerBookDTO);
     }
 }
