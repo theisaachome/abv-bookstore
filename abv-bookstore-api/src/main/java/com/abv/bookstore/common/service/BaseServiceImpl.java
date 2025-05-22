@@ -1,17 +1,18 @@
 package com.abv.bookstore.common.service;
 
+import com.abv.bookstore.common.BaseRepository;
 import com.abv.bookstore.common.exception.ResourceNotFoundException;
 import com.abv.bookstore.common.mapper.BaseMapper;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public class BaseServiceImpl <Req,Res,ID,Entity> implements BaseService<Req,Res,ID> {
 
-    protected final JpaRepository<Entity,ID> repository;
+    protected final BaseRepository<Entity,ID> repository;
     protected final BaseMapper<Req,Res,Entity> baseMapper;
     private Class<Entity> entityClass;
     private Class<Res> resourceClass;
 
-    public BaseServiceImpl(JpaRepository<Entity, ID> repository,
+    public BaseServiceImpl(BaseRepository<Entity, ID> repository,
                            BaseMapper<Req, Res, Entity> baseMapper,
                            Class<Entity> entityClass, Class<Res> resourceClass) {
         this.repository = repository;

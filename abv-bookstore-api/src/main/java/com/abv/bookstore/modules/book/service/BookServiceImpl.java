@@ -1,8 +1,11 @@
 package com.abv.bookstore.modules.book.service;
-
+import com.abv.bookstore.common.service.BaseSpecification;
+import com.abv.bookstore.common.service.SearchCriteria;
+import com.abv.bookstore.common.service.SearchOperation;
 import com.abv.bookstore.common.util.StockType;
 import com.abv.bookstore.common.domain.Type;
 import com.abv.bookstore.common.service.BaseServiceImpl;
+import com.abv.bookstore.modules.book.dto.BookFilter;
 import com.abv.bookstore.modules.book.dto.BookRequest;
 import com.abv.bookstore.modules.book.dto.BookResponse;
 import com.abv.bookstore.modules.book.entity.Book;
@@ -16,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,12 +61,27 @@ public class BookServiceImpl extends BaseServiceImpl<BookRequest,BookResponse,Lo
     }
 
     @Override
-    public Page<BookResponse> searchAndPaginate(int page, int size, String sortBy,String sortOrder) {
+    public Page<BookResponse> searchAndPaginate(BookFilter filter, int page, int size, String sortBy, String sortOrder) {
         Sort sortDir = sortOrder.equalsIgnoreCase(Sort.Direction.ASC.name())?
                 Sort.by(sortBy).ascending():Sort.by(sortBy).descending();
 
         Pageable pageable = PageRequest.of(page, size, sortDir);
-        var bookPages = repository.findAll(pageable);
+
+        // filter build-up
+        BaseSpecification<Book> specification = new BaseSpecification<>();
+        if (filter.title() != null && !filter.title().isBlank()) {
+            specification.add(new SearchCriteria("title",filter.title(), SearchOperation.LIKE));
+        }
+        if(filter.sku() != null && !filter.sku().isBlank()){
+            specification.add(new SearchCriteria("sku",filter.sku(), SearchOperation.LIKE));
+        }
+//        if(filter.author() != null && !filter.author().isBlank()){
+//            specification.add(new SearchCriteria("author.name",filter.author(), SearchOperation.LIKE));
+//        }
+        if(filter.author() != null && !filter.author().isBlank()){
+            specification.add(new SearchCriteria("author",filter.author(), SearchOperation.LIKE));
+        }
+        var bookPages =  repository.findAll(specification,pageable);
         return bookPages.map(base -> baseMapper.mapToResponseDTO(base));
     }
 }

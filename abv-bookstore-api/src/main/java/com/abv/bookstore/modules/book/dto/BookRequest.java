@@ -17,7 +17,7 @@ public record BookRequest(
 
         String longDescription,
 
-        @Pattern(regexp = "\\d{13}", message = "ISBN must be a 13-digit number")
+//        @Pattern(regexp = "\\d{13}", message = "ISBN must be a 13-digit number")
         String isbn,
 
         @NotNull(message = "Price is required")
