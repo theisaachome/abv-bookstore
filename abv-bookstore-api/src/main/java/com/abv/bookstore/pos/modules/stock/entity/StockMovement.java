@@ -1,7 +1,7 @@
-package com.abv.bookstore.pos.modules.inventory.entity;
+package com.abv.bookstore.pos.modules.stock.entity;
 
 import com.abv.bookstore.pos.common.domain.BaseEntity;
-import com.abv.bookstore.pos.common.domain.Type;
+import com.abv.bookstore.pos.common.domain.StockMovementType;
 import com.abv.bookstore.pos.modules.book.entity.Book;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -15,7 +15,7 @@ public class StockMovement extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Type type;
+    private StockMovementType stockMovementType;
 
     @Column(nullable = false)
     private Integer quantity = 0;

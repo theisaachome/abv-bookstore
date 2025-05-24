@@ -3,7 +3,7 @@ import com.abv.bookstore.pos.common.service.BaseSpecification;
 import com.abv.bookstore.pos.common.service.SearchCriteria;
 import com.abv.bookstore.pos.common.service.SearchOperation;
 import com.abv.bookstore.pos.common.util.StockType;
-import com.abv.bookstore.pos.common.domain.Type;
+import com.abv.bookstore.pos.common.domain.StockMovementType;
 import com.abv.bookstore.pos.common.service.BaseServiceImpl;
 import com.abv.bookstore.pos.modules.book.dto.BookFilter;
 import com.abv.bookstore.pos.modules.book.dto.BookRequest;
@@ -12,8 +12,8 @@ import com.abv.bookstore.pos.modules.book.dto.SellerBookDTO;
 import com.abv.bookstore.pos.modules.book.entity.Book;
 import com.abv.bookstore.pos.modules.book.mapper.BookMapper;
 import com.abv.bookstore.pos.modules.book.repo.BookRepository;
-import com.abv.bookstore.pos.modules.inventory.entity.StockMovement;
-import com.abv.bookstore.pos.modules.inventory.repo.StockMovementRepository;
+import com.abv.bookstore.pos.modules.stock.entity.StockMovement;
+import com.abv.bookstore.pos.modules.stock.repo.StockMovementRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -47,9 +47,9 @@ public class BookServiceImpl extends BaseServiceImpl<BookRequest,BookResponse,Lo
         // update Stock
         var stockMovement= new StockMovement();
         stockMovement.setBook(savedEntity);
-        stockMovement.setType(Type.INBOUND);
+        stockMovement.setStockMovementType(StockMovementType.INBOUND);
         int quantity = request.initialStockQuantity();
-        stockMovement.setQuantity(stockMovement.getType().apply(quantity));
+        stockMovement.setQuantity(stockMovement.getStockMovementType().apply(quantity));
         stockMovement.setReason(StockType.INITIAL_STOCK);
         stockMovementRepository.save(stockMovement);
 

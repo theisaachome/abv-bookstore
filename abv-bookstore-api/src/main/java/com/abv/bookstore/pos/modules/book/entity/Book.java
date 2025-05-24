@@ -1,9 +1,7 @@
 package com.abv.bookstore.pos.modules.book.entity;
 import com.abv.bookstore.pos.common.domain.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import com.abv.bookstore.pos.modules.stock.entity.StockMovement;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -42,6 +40,9 @@ public class Book extends BaseEntity {
 
     @Column(length = 255,unique = true,nullable = false)
     private String sku; // Unique code or SKU for the book
+
+    @OneToMany(mappedBy = "book",cascade = CascadeType.ALL)
+    private List<StockMovement> stockMovements = new ArrayList<>();
 
     @OneToMany
     private List<BookPrice> prices= new ArrayList<>();
