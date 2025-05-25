@@ -2,7 +2,7 @@ package com.abv.bookstore.pos.modules.book.service;
 import com.abv.bookstore.pos.common.service.BaseSpecification;
 import com.abv.bookstore.pos.common.service.SearchCriteria;
 import com.abv.bookstore.pos.common.service.SearchOperation;
-import com.abv.bookstore.pos.common.util.StockType;
+import com.abv.bookstore.pos.common.util.StockTypeReason;
 import com.abv.bookstore.pos.common.domain.StockMovementType;
 import com.abv.bookstore.pos.common.service.BaseServiceImpl;
 import com.abv.bookstore.pos.modules.book.dto.BookFilter;
@@ -50,7 +50,7 @@ public class BookServiceImpl extends BaseServiceImpl<BookRequest,BookResponse,Lo
         stockMovement.setStockMovementType(StockMovementType.INBOUND);
         int quantity = request.initialStockQuantity();
         stockMovement.setQuantity(stockMovement.getStockMovementType().apply(quantity));
-        stockMovement.setReason(StockType.INITIAL_STOCK);
+        stockMovement.setReason(StockTypeReason.INITIAL_STOCK);
         stockMovementRepository.save(stockMovement);
 
         return baseMapper.mapToResponseDTO(savedEntity);

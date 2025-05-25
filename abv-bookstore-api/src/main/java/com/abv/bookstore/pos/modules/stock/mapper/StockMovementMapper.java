@@ -1,7 +1,7 @@
 package com.abv.bookstore.pos.modules.stock.mapper;
 
 import com.abv.bookstore.pos.common.mapper.BaseMapper;
-import com.abv.bookstore.pos.common.util.StockType;
+import com.abv.bookstore.pos.common.util.StockTypeReason;
 import com.abv.bookstore.pos.modules.stock.dto.BookStockResponse;
 import com.abv.bookstore.pos.modules.stock.dto.BookStockUpdateRequest;
 import com.abv.bookstore.pos.modules.stock.entity.StockMovement;
@@ -13,7 +13,7 @@ public class StockMovementMapper implements BaseMapper<BookStockUpdateRequest, B
     public StockMovement mapToEntity(BookStockUpdateRequest request) {
         StockMovement stockMovement = new StockMovement();
         stockMovement.setStockMovementType(request.stockStockMovementType());
-        stockMovement.setReason(StockType.RESTOCK);
+        stockMovement.setReason(request.reason()!=null? request.reason() : StockTypeReason.RESTOCK);
         stockMovement.setQuantity(stockMovement.getStockMovementType().apply(request.quantity()));
         stockMovement.setStockMovementType(request.stockStockMovementType());
         return stockMovement;

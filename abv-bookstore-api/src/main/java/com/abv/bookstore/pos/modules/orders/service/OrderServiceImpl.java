@@ -1,6 +1,9 @@
 package com.abv.bookstore.pos.modules.orders.service;
+import com.abv.bookstore.pos.common.domain.StockMovementType;
+import com.abv.bookstore.pos.common.exception.APIException;
 import com.abv.bookstore.pos.common.exception.ResourceNotFoundException;
 import com.abv.bookstore.pos.common.service.BaseServiceImpl;
+import com.abv.bookstore.pos.common.util.StockTypeReason;
 import com.abv.bookstore.pos.modules.book.entity.Book;
 import com.abv.bookstore.pos.modules.book.repo.BookRepository;
 import com.abv.bookstore.pos.modules.orders.dt.OrderItemRequestDTO;
@@ -10,6 +13,9 @@ import com.abv.bookstore.pos.modules.orders.entity.Order;
 import com.abv.bookstore.pos.modules.orders.entity.OrderItem;
 import com.abv.bookstore.pos.modules.orders.mapper.OrderMapper;
 import com.abv.bookstore.pos.modules.orders.repos.OrderRepository;
+import com.abv.bookstore.pos.modules.stock.entity.StockMovement;
+import com.abv.bookstore.pos.modules.stock.repo.StockMovementRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -23,12 +29,14 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderRequestDTO, OrderResp
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final BookRepository bookRepository;
+    private final StockMovementRepository stockMovementRepository;
 
-    public OrderServiceImpl(OrderRepository orderRepository, OrderMapper mapper, BookRepository bookRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, OrderMapper mapper, BookRepository bookRepository, StockMovementRepository stockMovementRepository) {
         super(orderRepository, mapper, Order.class, OrderResponseDTO.class);
         this.orderRepository = orderRepository;
         this.orderMapper = mapper;
         this.bookRepository = bookRepository;
+        this.stockMovementRepository = stockMovementRepository;
     }
 
     @Override
@@ -46,9 +54,20 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderRequestDTO, OrderResp
 //            var book = bookRepository.findById(itemDTO.bookId())
 //                    .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
             var book = bookMap.get(itemDTO.bookId());
+
             if(book == null) {
                 throw new ResourceNotFoundException("Book not found");
             }
+            // check stock-no
+            if (!isStockAvailable(itemDTO.quantity(),book.getId())){
+                throw new APIException(HttpStatus.BAD_REQUEST,"Stock Not available");
+            }
+            var stockMovement = new StockMovement();
+            stockMovement.setReason(StockTypeReason.SOLD_OUT);
+            stockMovement.setStockMovementType(StockMovementType.OUTBOUND);
+            stockMovement.setBook(book);
+            stockMovement.setQuantity(StockMovementType.OUTBOUND.apply(itemDTO.quantity()));
+
 
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
@@ -66,7 +85,9 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderRequestDTO, OrderResp
             orderItem.setBookSku(book.getSku());
 
             order.getOrderItems().add(orderItem);
+
             subtotal = subtotal.add(unitPrice.multiply(BigDecimal.valueOf(itemDTO.quantity())));
+            stockMovementRepository.save(stockMovement);
         }
 
         // Calculate totals
@@ -90,5 +111,13 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderRequestDTO, OrderResp
 
         var savedOrder = repository.save(order);
         return baseMapper.mapToResponseDTO(savedOrder);
+    }
+
+    private boolean isStockAvailable(int requestQuantity,Long bookId) {
+        var availableStockNumber = stockMovementRepository.sumStockByBook(bookId);
+        if(  availableStockNumber>=requestQuantity) {
+            return true;
+        }
+        return false;
     }
 }
