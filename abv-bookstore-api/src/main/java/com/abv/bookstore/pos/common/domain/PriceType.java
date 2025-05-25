@@ -1,5 +1,5 @@
 package com.abv.bookstore.pos.common.domain;
 
 public enum PriceType {
-    REGULAR, DISCOUNTED, PROMOTIONAL
+    REGULAR, DISCOUNTED, PROMOTION
 }

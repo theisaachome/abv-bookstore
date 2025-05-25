@@ -1,16 +1,16 @@
 package com.abv.bookstore.pos.modules.book.service;
+import com.abv.bookstore.pos.common.exception.ResourceNotFoundException;
 import com.abv.bookstore.pos.common.service.BaseSpecification;
 import com.abv.bookstore.pos.common.service.SearchCriteria;
 import com.abv.bookstore.pos.common.service.SearchOperation;
 import com.abv.bookstore.pos.common.util.StockTypeReason;
 import com.abv.bookstore.pos.common.domain.StockMovementType;
 import com.abv.bookstore.pos.common.service.BaseServiceImpl;
-import com.abv.bookstore.pos.modules.book.dto.BookFilter;
-import com.abv.bookstore.pos.modules.book.dto.BookRequest;
-import com.abv.bookstore.pos.modules.book.dto.BookResponse;
-import com.abv.bookstore.pos.modules.book.dto.SellerBookDTO;
+import com.abv.bookstore.pos.modules.book.dto.*;
 import com.abv.bookstore.pos.modules.book.entity.Book;
+import com.abv.bookstore.pos.modules.book.entity.BookPrice;
 import com.abv.bookstore.pos.modules.book.mapper.BookMapper;
+import com.abv.bookstore.pos.modules.book.repo.BookPriceRepository;
 import com.abv.bookstore.pos.modules.book.repo.BookRepository;
 import com.abv.bookstore.pos.modules.stock.entity.StockMovement;
 import com.abv.bookstore.pos.modules.stock.repo.StockMovementRepository;
@@ -20,6 +20,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,11 +32,13 @@ public class BookServiceImpl extends BaseServiceImpl<BookRequest,BookResponse,Lo
         implements BookService{
 
     private final StockMovementRepository stockMovementRepository;
+    private final BookPriceRepository bookPriceRepository;
     private final BookMapper bookMapper;
 
-    public BookServiceImpl(BookRepository repository, BookMapper mapper, StockMovementRepository stockMovementRepository, BookMapper bookMapper) {
+    public BookServiceImpl(BookRepository repository, BookMapper mapper, StockMovementRepository stockMovementRepository, BookPriceRepository bookPriceRepository, BookMapper bookMapper) {
         super(repository,mapper,Book.class,BookResponse.class);
         this.stockMovementRepository = stockMovementRepository;
+        this.bookPriceRepository = bookPriceRepository;
         this.bookMapper = bookMapper;
     }
 
@@ -44,6 +50,15 @@ public class BookServiceImpl extends BaseServiceImpl<BookRequest,BookResponse,Lo
         //  Save book first for ID (if it's a new book)
        var savedEntity=  repository.save(bookEntity);
 
+       // manage book-prices
+        var bookPrice = new BookPrice();
+        bookPrice.setPrice(new BigDecimal(String.valueOf(request.price())));
+        bookPrice.setStartDate(ZonedDateTime.now(ZoneOffset.UTC));
+        bookPrice.setEndDate(null); // no expiry
+        bookPrice.setBook(savedEntity);
+
+        savedEntity.addPrice(bookPrice);
+
         // update Stock
         var stockMovement= new StockMovement();
         stockMovement.setBook(savedEntity);
@@ -51,6 +66,8 @@ public class BookServiceImpl extends BaseServiceImpl<BookRequest,BookResponse,Lo
         int quantity = request.initialStockQuantity();
         stockMovement.setQuantity(stockMovement.getStockMovementType().apply(quantity));
         stockMovement.setReason(StockTypeReason.INITIAL_STOCK);
+
+
         stockMovementRepository.save(stockMovement);
 
         return baseMapper.mapToResponseDTO(savedEntity);
@@ -100,5 +117,25 @@ public class BookServiceImpl extends BaseServiceImpl<BookRequest,BookResponse,Lo
 
         var bookPages = repository.findAll(spec,pageable);
         return bookPages.map(bookMapper::mapToSellerBookDTO);
+    }
+
+    @Override
+    public BookPriceResponse addBookPrice(Long bookId,BookPriceRequest request) {
+        // check for book to add price
+        var book = repository.findById(bookId).orElseThrow(()->new ResourceNotFoundException("No book fond"));
+
+        var bookPrice = new BookPrice();
+        bookPrice.setPriceType(request.priceType());
+        bookPrice.setPrice(request.price());
+        bookPrice.setStartDate(request.startDate());
+        bookPrice.setEndDate(request.endDate());
+        bookPrice.setBook(book);
+        book.addPrice(bookPrice); // optional
+
+        var saveBookPrice =bookPriceRepository.save(bookPrice);
+        return new BookPriceResponse(saveBookPrice.getId(),saveBookPrice.getStartDate(),
+                saveBookPrice.getEndDate(),
+                saveBookPrice.getPriceType(),
+                bookPrice.getPriceType()+" has been added");
     }
 }

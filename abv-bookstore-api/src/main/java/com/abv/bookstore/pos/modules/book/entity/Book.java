@@ -7,10 +7,7 @@ import lombok.Setter;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Getter
 @Setter
@@ -44,7 +41,7 @@ public class Book extends BaseEntity {
     @OneToMany(mappedBy = "book",cascade = CascadeType.ALL)
     private List<StockMovement> stockMovements = new ArrayList<>();
 
-    @OneToMany
+    @OneToMany(mappedBy = "book",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BookPrice> prices= new ArrayList<>();
 
     public Optional<BookPrice> getCurrentPrice() {
@@ -54,5 +51,24 @@ public class Book extends BaseEntity {
                         (p.getEndDate() == null || !now.isAfter(p.getEndDate())))
                 .max(Comparator.comparing(BookPrice::getCreatedAt));
     }
+
+    public void addPrice(BookPrice bookPrice) {
+        this.prices.add(bookPrice);
+        bookPrice.setBook(this);
+    }
+
+    public void removePrice(BookPrice bookPrice) {
+        bookPrice.setBook(null);
+        this.prices.remove(bookPrice);
+    }
+    public void removeAllPrices() {
+        Iterator<BookPrice> iterator = prices.iterator();
+        while (iterator.hasNext()) {
+            BookPrice bookPrice = iterator.next();
+            bookPrice.setBook(null);
+            iterator.remove();
+        }
+    }
+
 
 }

@@ -1,10 +1,7 @@
 package com.abv.bookstore.pos.modules.book.service;
 
 import com.abv.bookstore.pos.common.service.BaseService;
-import com.abv.bookstore.pos.modules.book.dto.BookFilter;
-import com.abv.bookstore.pos.modules.book.dto.BookRequest;
-import com.abv.bookstore.pos.modules.book.dto.BookResponse;
-import com.abv.bookstore.pos.modules.book.dto.SellerBookDTO;
+import com.abv.bookstore.pos.modules.book.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -17,4 +14,6 @@ public interface BookService extends BaseService<BookRequest, BookResponse,Long>
     // seller operation for book-order
     Page<SellerBookDTO> searchBooks(String query, Pageable pageable);     // Seller
 //    SellerBookDTO getBookBySku(String sku);            // Seller
+    BookPriceResponse addBookPrice(Long bookId,BookPriceRequest request);
+
 }

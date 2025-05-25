@@ -4,10 +4,9 @@ import com.abv.bookstore.pos.common.controller.BaseController;
 import com.abv.bookstore.pos.common.domain.ApiResponse;
 import com.abv.bookstore.pos.common.domain.PageResponse;
 import com.abv.bookstore.pos.common.util.AppConstants;
-import com.abv.bookstore.pos.modules.book.dto.BookFilter;
-import com.abv.bookstore.pos.modules.book.dto.BookRequest;
-import com.abv.bookstore.pos.modules.book.dto.BookResponse;
+import com.abv.bookstore.pos.modules.book.dto.*;
 import com.abv.bookstore.pos.modules.book.service.BookService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,5 +35,13 @@ public class BookManagementController extends BaseController<BookRequest, BookRe
         var paginatedResults = bookService.searchAndPaginate(bookFilter,page,limit,sort,direction);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(respondPage(paginatedResults,"Books fetched"));
+    }
+
+    @PostMapping("/{bookId}/promotion-price")
+    public ResponseEntity<ApiResponse<BookPriceResponse>> addPromotionPrice(@PathVariable("bookId")Long bookId,
+                                                                            @RequestBody @Valid BookPriceRequest request){
+        var result = bookService.addBookPrice(bookId,request);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse<>("new book price has been added successfully.",result));
     }
 }
