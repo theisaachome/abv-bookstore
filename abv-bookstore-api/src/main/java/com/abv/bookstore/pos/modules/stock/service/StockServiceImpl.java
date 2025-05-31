@@ -25,12 +25,21 @@ implements StockService {
     }
 
     @Override
-    public BookStockResponse updateBookStock(Long bookId, BookStockUpdateRequest bookStockUpdateRequest) {
-        var book = bookRepository.findById(bookId)
+    public BookStockResponse updateBookStock(BookStockUpdateRequest bookStockUpdateRequest) {
+        var book = bookRepository.findById(bookStockUpdateRequest.bookId())
                 .orElseThrow(()->new ResourceNotFoundException("Book not found"));
         var newStock = stockMovementMapper.mapToEntity(bookStockUpdateRequest);
         newStock.setBook(book);
        var saveStock= stockMovementRepository.save(newStock);
         return stockMovementMapper.mapToResponseDTO(saveStock);
+    }
+
+    @Override
+    public boolean isStockAvailable(int requestQuantity, Long bookId) {
+        var availableStockNumber = stockMovementRepository.sumStockByBook(bookId);
+        if(  availableStockNumber>=requestQuantity) {
+            return true;
+        }
+        return false;
     }
 }

@@ -18,8 +18,34 @@ public class StockManagementController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<BookStockResponse>> create(@RequestBody BookStockUpdateRequest request) {
-      var result =stockService.updateBookStock(request.bookId(),request);
+      var result =stockService.updateBookStock(request);
       return ResponseEntity.status(HttpStatus.CREATED)
               .body(new ApiResponse<>("success",result));
     }
 }
+/*
+
+---------------------------------------------------------
+
+| Book Title | Current Stock | Actions                    |
+| ---------- | ------------- | -------------------------- |
+| Book A     | 5             | \[Restock] \[Reduce Stock] |
+| Book B     | 12            | \[Restock] \[Reduce Stock] |
+
+
+        | [📘 Book Title]             | Stock: 12 copies         |
+        | Author: John Doe           | Last Movement: 2025-05-30 |
+        ---------------------------------------------------------
+
+        [Restock] [Reduce Stock] [View History]
+
+        ---------------------------------------------------------
+        [Modal: Restock Book]
+        - Stock Movement Type: (INBOUND / OUTBOUND)
+        - Quantity: [ 10 ]
+        - Reason:   [ Restocked after PO #456 ]
+        - Submit / Cancel
+---------------------------------------------------------
+
+
+ */

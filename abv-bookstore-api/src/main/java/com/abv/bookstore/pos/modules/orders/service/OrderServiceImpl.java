@@ -13,10 +13,13 @@ import com.abv.bookstore.pos.modules.orders.entity.Order;
 import com.abv.bookstore.pos.modules.orders.entity.OrderItem;
 import com.abv.bookstore.pos.modules.orders.mapper.OrderMapper;
 import com.abv.bookstore.pos.modules.orders.repos.OrderRepository;
+import com.abv.bookstore.pos.modules.stock.dto.BookStockUpdateRequest;
 import com.abv.bookstore.pos.modules.stock.entity.StockMovement;
 import com.abv.bookstore.pos.modules.stock.repo.StockMovementRepository;
+import com.abv.bookstore.pos.modules.stock.service.StockService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -29,16 +32,21 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderRequestDTO, OrderResp
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final BookRepository bookRepository;
-    private final StockMovementRepository stockMovementRepository;
+//    private final StockMovementRepository stockMovementRepository;
+    private final StockService stockService;
 
-    public OrderServiceImpl(OrderRepository orderRepository, OrderMapper mapper, BookRepository bookRepository, StockMovementRepository stockMovementRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, OrderMapper mapper,
+                            BookRepository bookRepository,
+                            StockService stockService) {
         super(orderRepository, mapper, Order.class, OrderResponseDTO.class);
         this.orderRepository = orderRepository;
         this.orderMapper = mapper;
         this.bookRepository = bookRepository;
-        this.stockMovementRepository = stockMovementRepository;
+        this.stockService = stockService;
+//        this.stockMovementRepository = stockMovementRepository;
     }
 
+    @Transactional
     @Override
     public OrderResponseDTO create(OrderRequestDTO request) {
         var order = baseMapper.mapToEntity(request);
@@ -51,44 +59,28 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderRequestDTO, OrderResp
 
         // Process order items
         for (OrderItemRequestDTO itemDTO : request.orderItems()) {
-//            var book = bookRepository.findById(itemDTO.bookId())
-//                    .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
             var book = bookMap.get(itemDTO.bookId());
 
             if(book == null) {
                 throw new ResourceNotFoundException("Book not found");
             }
-            // check stock-no
-            if (!isStockAvailable(itemDTO.quantity(),book.getId())){
+            // check stock-quantity...
+            if (!stockService.isStockAvailable(itemDTO.quantity(),book.getId())){
                 throw new APIException(HttpStatus.BAD_REQUEST,"Stock Not available");
             }
-            var stockMovement = new StockMovement();
-            stockMovement.setReason(StockTypeReason.SOLD_OUT);
-            stockMovement.setStockMovementType(StockMovementType.OUTBOUND);
-            stockMovement.setBook(book);
-            stockMovement.setQuantity(StockMovementType.OUTBOUND.apply(itemDTO.quantity()));
+            // create order Item
+            OrderItem orderItem = createOrderItem(order,book,itemDTO);
+            order.addOrderItem(orderItem);
 
-
-            OrderItem orderItem = new OrderItem();
-            orderItem.setOrder(order);
-            orderItem.setBook(book);
-            orderItem.setQuantity(itemDTO.quantity());
-
-            // Use provided unit price or book's current price
-            BigDecimal unitPrice = itemDTO.unitPrice() != null
-                    ? itemDTO.unitPrice()
-//                    :BigDecimal.TEN;
-                    : book.getCurrentPrice().get().getPrice();
-            orderItem.setUnitPrice(unitPrice);
-
-            // Store snapshots for historical reference
-            orderItem.setBookTitle(book.getTitle());
-            orderItem.setBookSku(book.getSku());
-
-            order.getOrderItems().add(orderItem);
-
-            subtotal = subtotal.add(unitPrice.multiply(BigDecimal.valueOf(itemDTO.quantity())));
-            stockMovementRepository.save(stockMovement);
+            subtotal = subtotal.add(orderItem.getUnitPrice().multiply(BigDecimal.valueOf(itemDTO.quantity())));
+//            stockMovementRepository.save(stockMovement);
+            stockService.updateBookStock(
+                    new BookStockUpdateRequest(
+                            book.getId(),
+                            StockMovementType.INBOUND,
+                            itemDTO.quantity(),
+                            StockTypeReason.SOLD_OUT
+                            ));
         }
 
         // Calculate totals
@@ -110,15 +102,30 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderRequestDTO, OrderResp
         BigDecimal totalAmount = subtotal.add(taxAmount).subtract(discountAmount);
         order.setTotalAmount(totalAmount);
 
-        var savedOrder = repository.save(order);
+        var savedOrder = orderRepository.save(order);
         return baseMapper.mapToResponseDTO(savedOrder);
     }
 
-    private boolean isStockAvailable(int requestQuantity,Long bookId) {
-        var availableStockNumber = stockMovementRepository.sumStockByBook(bookId);
-        if(  availableStockNumber>=requestQuantity) {
-            return true;
-        }
-        return false;
+
+    private OrderItem createOrderItem(Order order, Book book, OrderItemRequestDTO itemDTO) {
+
+        OrderItem orderItem = new OrderItem();
+        orderItem.setOrder(order);
+        orderItem.setBook(book);
+        orderItem.setQuantity(itemDTO.quantity());
+
+        // Use provided unit price or book's current price
+        BigDecimal unitPrice = itemDTO.unitPrice() != null
+                ? itemDTO.unitPrice()
+                : book.getCurrentPrice().get().getPrice();
+        orderItem.setUnitPrice(unitPrice);
+
+        // Store snapshots for historical reference
+        orderItem.setBookTitle(book.getTitle());
+        orderItem.setBookSku(book.getSku());
+
+        return orderItem;
     }
+
+
 }

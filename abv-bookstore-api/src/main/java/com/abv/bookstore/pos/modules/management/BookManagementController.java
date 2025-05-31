@@ -37,7 +37,7 @@ public class BookManagementController extends BaseController<BookRequest, BookRe
                 .body(respondPage(paginatedResults,"Books fetched"));
     }
 
-    @PostMapping("/{bookId}/promotion-price")
+    @PostMapping("/{bookId}/prices")
     public ResponseEntity<ApiResponse<BookPriceResponse>> addPromotionPrice(@PathVariable("bookId")Long bookId,
                                                                             @RequestBody @Valid BookPriceRequest request){
         var result = bookService.addBookPrice(bookId,request);

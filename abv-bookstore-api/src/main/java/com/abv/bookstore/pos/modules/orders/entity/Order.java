@@ -1,6 +1,7 @@
 package com.abv.bookstore.pos.modules.orders.entity;
 
 import com.abv.bookstore.pos.common.domain.BaseEntity;
+import com.abv.bookstore.pos.modules.book.entity.BookPrice;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Getter
@@ -93,4 +95,22 @@ public class Order extends BaseEntity {
                 .sum();
     }
 
+    public void addOrderItem(OrderItem orderItem){
+        this.orderItems.add(orderItem);
+        orderItem.setOrder(this);
+    }
+
+    public void removeOrderItem(OrderItem orderItem) {
+        orderItem.setOrder(null);
+        this.orderItems.remove(orderItem);
+    }
+
+    public void removeAllOrderItem(){
+        Iterator<OrderItem> iterator = this.orderItems.iterator();
+        while(iterator.hasNext()){
+            OrderItem orderItem = iterator.next();
+            orderItem.setOrder(null);
+            iterator.remove();
+        }
+    }
 }
