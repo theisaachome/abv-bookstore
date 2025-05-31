@@ -76,8 +76,9 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderRequestDTO, OrderResp
 
             // Use provided unit price or book's current price
             BigDecimal unitPrice = itemDTO.unitPrice() != null
-                    ? itemDTO.unitPrice():BigDecimal.TEN;
-//                    : book.getCurrentPrice().get().getPrice();
+                    ? itemDTO.unitPrice()
+//                    :BigDecimal.TEN;
+                    : book.getCurrentPrice().get().getPrice();
             orderItem.setUnitPrice(unitPrice);
 
             // Store snapshots for historical reference

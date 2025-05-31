@@ -21,7 +21,13 @@ public class StockMovementMapper implements BaseMapper<BookStockUpdateRequest, B
 
     @Override
     public BookStockResponse mapToResponseDTO(StockMovement stockMovement) {
-        return new BookStockResponse(stockMovement.getReason());
+        return new BookStockResponse(
+                "Book stock updated",
+                stockMovement.getBook().getId(),
+                stockMovement.getStockMovementType(),
+                stockMovement.getQuantity(),
+                stockMovement.getReason()
+                );
     }
 
     @Override

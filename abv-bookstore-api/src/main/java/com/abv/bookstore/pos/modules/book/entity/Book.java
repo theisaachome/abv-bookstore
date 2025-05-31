@@ -47,7 +47,8 @@ public class Book extends BaseEntity {
     public Optional<BookPrice> getCurrentPrice() {
         ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
         return prices.stream()
-                .filter(p -> (p.getStartDate() == null || !now.isBefore(p.getStartDate())) &&
+                .filter(p -> (p.getStartDate() == null || !now.isBefore(p.getStartDate()))
+                        &&
                         (p.getEndDate() == null || !now.isAfter(p.getEndDate())))
                 .max(Comparator.comparing(BookPrice::getCreatedAt));
     }

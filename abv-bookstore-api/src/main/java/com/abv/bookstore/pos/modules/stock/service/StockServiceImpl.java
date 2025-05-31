@@ -1,8 +1,5 @@
 package com.abv.bookstore.pos.modules.stock.service;
-
-import com.abv.bookstore.pos.common.BaseRepository;
 import com.abv.bookstore.pos.common.exception.ResourceNotFoundException;
-import com.abv.bookstore.pos.common.mapper.BaseMapper;
 import com.abv.bookstore.pos.common.service.BaseServiceImpl;
 import com.abv.bookstore.pos.modules.book.repo.BookRepository;
 import com.abv.bookstore.pos.modules.stock.dto.BookStockResponse;

@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record BookStockUpdateRequest(
+        @NotNull(message = "Book Id can't not be null")
+        Long bookId,
         @NotNull
         StockMovementType stockStockMovementType, // IN or OUT
         @Min(1)
