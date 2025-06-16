@@ -1,15 +1,10 @@
 package com.abv.bookstore.pos.common.controller;
-
 import com.abv.bookstore.pos.common.domain.ApiResponse;
-import com.abv.bookstore.pos.common.domain.PageResponse;
 import com.abv.bookstore.pos.common.service.BaseService;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.Instant;
 
 
 public abstract class BaseController <Req,Res,ID>{
@@ -20,46 +15,31 @@ public abstract class BaseController <Req,Res,ID>{
         this.service = service;
     }
 
-    // json formatted a resource response
-    protected <T> ApiResponse<T> respond(T data,String message) {
-        return  new ApiResponse<>("success",message,data, Instant.now());
-    }
-
-    // json formatted list of resource response
-    protected <T> ApiResponse<PageResponse<T>> respondPage(Page<T> page, String message) {
-        PageResponse<T> pageResponse = new PageResponse<>(
-                page.getContent(),
-                page.getNumber(),
-                page.getSize(),
-                page.getTotalElements(),
-                page.getTotalPages(),
-                page.isLast()
-        );
-        return new ApiResponse<>("success", message, pageResponse, Instant.now());
-    }
-
     @PostMapping
     public ResponseEntity<ApiResponse<Res>> create(@RequestBody @Valid Req request) {
         var response = service.create(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(respond(response,"Created successfully"));
+                .body(ResponseHelper.respond(response,"Created successfully"));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Res>> getById(@PathVariable ID id) {
         var result = service.findById(id);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(respond(result,"Found successfully"));
+                .body(ResponseHelper.respond(result,"Found successfully"));
     }
 
-
+    // standard resource update
     @PutMapping("/{id}")
-    public ResponseEntity<Res> update(@PathVariable ID id, @RequestBody @Valid Req request) {
-
-        return ResponseEntity.ok(service.update(id, request));
+    public ResponseEntity<ApiResponse<Res>> update(@PathVariable ID id, @RequestBody @Valid Req request) {
+        var result = service.update(id, request);
+        return  ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResponseHelper.respond(result,"Updated successfully"));
     }
 
+    // soft delete for resource (no-physical delete)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable ID id) {
         service.delete(id);

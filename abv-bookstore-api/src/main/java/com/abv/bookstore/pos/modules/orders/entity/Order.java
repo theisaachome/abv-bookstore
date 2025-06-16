@@ -16,7 +16,6 @@ import java.util.List;
 
 @Getter
 @Setter
-
 @Entity
 @Table(name="orders")
 public class Order extends BaseEntity {
@@ -25,7 +24,7 @@ public class Order extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private OrderStatus status; // PENDING, COMPLETED, CANCELLED, REFUNDED
+    private OrderStatus orderStatus; // PENDING, COMPLETED, CANCELLED, REFUNDED
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

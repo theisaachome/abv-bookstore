@@ -24,11 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
-public class BookServiceImpl extends BaseServiceImpl<BookRequest,BookResponse,Long, Book>
+public class BookServiceImpl extends BaseServiceImpl<BookReq, BookRes,Long, Book>
         implements BookService{
 
     private final StockMovementRepository stockMovementRepository;
@@ -36,7 +34,7 @@ public class BookServiceImpl extends BaseServiceImpl<BookRequest,BookResponse,Lo
     private final BookMapper bookMapper;
 
     public BookServiceImpl(BookRepository repository, BookMapper mapper, StockMovementRepository stockMovementRepository, BookPriceRepository bookPriceRepository, BookMapper bookMapper) {
-        super(repository,mapper,Book.class,BookResponse.class);
+        super(repository,mapper,Book.class, BookRes.class);
         this.stockMovementRepository = stockMovementRepository;
         this.bookPriceRepository = bookPriceRepository;
         this.bookMapper = bookMapper;
@@ -44,7 +42,7 @@ public class BookServiceImpl extends BaseServiceImpl<BookRequest,BookResponse,Lo
 
     @Transactional
     @Override
-    public BookResponse create(BookRequest request) {
+    public BookRes create(BookReq request) {
         var bookEntity = baseMapper.mapToEntity(request);
 
         //  Save book first for ID (if it's a new book)
@@ -63,7 +61,7 @@ public class BookServiceImpl extends BaseServiceImpl<BookRequest,BookResponse,Lo
         var stockMovement= new StockMovement();
         stockMovement.setBook(savedEntity);
         stockMovement.setStockMovementType(StockMovementType.INBOUND);
-        int quantity = request.initialStockQuantity();
+        int quantity = request.stockQuantity();
         stockMovement.setQuantity(stockMovement.getStockMovementType().apply(quantity));
         stockMovement.setReason(StockTypeReason.INITIAL_STOCK);
 
@@ -72,15 +70,8 @@ public class BookServiceImpl extends BaseServiceImpl<BookRequest,BookResponse,Lo
 
         return baseMapper.mapToResponseDTO(savedEntity);
     }
-
     @Override
-    public List<BookResponse> findAllBook() {
-        var books = repository.findAll();
-        return books.stream().map(baseMapper::mapToResponseDTO).collect(Collectors.toList());
-    }
-
-    @Override
-    public Page<BookResponse> searchAndPaginate(BookFilter filter, int page, int size, String sortBy, String sortOrder) {
+    public Page<BookInventoryDto> searchAndPaginate(BookFilter filter, int page, int size, String sortBy, String sortOrder) {
         Sort sortDir = sortOrder.equalsIgnoreCase(Sort.Direction.ASC.name())?
                 Sort.by(sortBy).ascending():Sort.by(sortBy).descending();
 
@@ -101,7 +92,7 @@ public class BookServiceImpl extends BaseServiceImpl<BookRequest,BookResponse,Lo
             specification.add(new SearchCriteria("author",filter.author(), SearchOperation.LIKE));
         }
         var bookPages =  repository.findAll(specification,pageable);
-        return bookPages.map(base -> baseMapper.mapToResponseDTO(base));
+        return bookPages.map(base -> bookMapper.mapToBookInventoryDto((base)));
     }
 
     @Override

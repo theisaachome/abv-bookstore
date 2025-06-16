@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -101,8 +102,17 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderRequestDTO, OrderResp
 
         BigDecimal totalAmount = subtotal.add(taxAmount).subtract(discountAmount);
         order.setTotalAmount(totalAmount);
+        order.setCreatedAt(ZonedDateTime.now());
+        order.setUpdatedAt(ZonedDateTime.now());
 
-        var savedOrder = orderRepository.save(order);
+        Order savedOrder;
+        try {
+           savedOrder = orderRepository.save(order);
+
+        } catch (Exception ex) {
+            ex.printStackTrace(); // Or log the full exception
+            throw ex;
+        }
         return baseMapper.mapToResponseDTO(savedOrder);
     }
 

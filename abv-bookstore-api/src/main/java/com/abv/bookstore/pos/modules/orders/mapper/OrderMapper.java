@@ -26,7 +26,7 @@ public class OrderMapper implements BaseMapper<OrderRequestDTO, OrderResponseDTO
         Order order = new Order();
         order.setOrderNumber(AppCodeGenerator.generateOrderNumber());
         order.setType(request.orderType());
-        order.setStatus(OrderStatus.COMPLETED); // walk-in
+        order.setOrderStatus(OrderStatus.COMPLETED); // walk-in
         order.setCustomerName(request.customerName());
         order.setCustomerEmail(request.customerEmail());
         order.setCustomerPhone(request.customerPhone());
@@ -61,7 +61,7 @@ public class OrderMapper implements BaseMapper<OrderRequestDTO, OrderResponseDTO
         return new OrderResponseDTO(
                 order.getId(),
                 order.getOrderNumber(),
-                order.getStatus(),
+                order.getOrderStatus(),
                 order.getType(),
                 order.getSubtotal(),
                 order.getTaxAmount(),
@@ -81,7 +81,7 @@ public class OrderMapper implements BaseMapper<OrderRequestDTO, OrderResponseDTO
     }
 
     @Override
-    public void updateEntity(OrderRequestDTO request, Order order) {
-
+    public Order updateEntity(OrderRequestDTO request, Order order) {
+        return  order;
     }
 }

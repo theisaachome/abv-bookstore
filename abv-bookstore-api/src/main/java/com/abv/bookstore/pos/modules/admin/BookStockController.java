@@ -1,7 +1,7 @@
-package com.abv.bookstore.pos.modules.management;
+package com.abv.bookstore.pos.modules.admin;
 
 import com.abv.bookstore.pos.common.domain.ApiResponse;
-import com.abv.bookstore.pos.modules.stock.dto.BookStockResponse;
+import com.abv.bookstore.pos.modules.stock.dto.AddStockReq;
 import com.abv.bookstore.pos.modules.stock.dto.BookStockUpdateRequest;
 import com.abv.bookstore.pos.modules.stock.service.StockService;
 import org.springframework.http.HttpStatus;
@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/admin/books/stocks")
-public class StockManagementController {
+public class BookStockController {
     private final StockService stockService;
-    public StockManagementController(StockService stockService) {
+    public BookStockController(StockService stockService) {
         this.stockService = stockService;
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<BookStockResponse>> create(@RequestBody BookStockUpdateRequest request) {
+    public ResponseEntity<ApiResponse<AddStockReq>> create(@RequestBody BookStockUpdateRequest request) {
       var result =stockService.updateBookStock(request);
       return ResponseEntity.status(HttpStatus.CREATED)
               .body(new ApiResponse<>("success",result));

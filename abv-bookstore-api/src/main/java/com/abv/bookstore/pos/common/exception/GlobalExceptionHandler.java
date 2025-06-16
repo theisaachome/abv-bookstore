@@ -37,6 +37,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex,
                                                               WebRequest request){
+        ex.printStackTrace(); // Don't skip this!
         var errorDetails = new ErrorResponse();
         errorDetails.setMessage(ex.getMessage());
         errorDetails.setErrorCode("INTERNAL_SERVER_ERROR");
@@ -71,4 +72,6 @@ public class GlobalExceptionHandler {
 //        error.setPath(request.getRequestURI());
 //        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
 //    }
+
+
 }

@@ -4,6 +4,8 @@ import com.abv.bookstore.pos.modules.book.entity.Book;
 import com.abv.bookstore.pos.modules.stock.dto.BookStockView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 
 public interface BookRepository extends BaseRepository<Book, Long> {
@@ -23,5 +25,9 @@ public interface BookRepository extends BaseRepository<Book, Long> {
 //    """
 //    )
 //    Page<BookStockView> findBooksWithStock(Pageable pageable);
+
+    @EntityGraph(attributePaths = {"prices", "stockMovements"})
+    Page<Book> findAll(Specification<Book> spec, Pageable pageable);
+
 
 }

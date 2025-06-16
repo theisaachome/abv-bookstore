@@ -48,8 +48,9 @@ public class OrderItem extends BaseEntity {
     @PrePersist
     @PreUpdate
     private void calculateLineTotal() {
-        if (unitPrice != null && quantity != null) {
-            this.lineTotal = unitPrice.multiply(BigDecimal.valueOf(quantity));
+        if (unitPrice == null || quantity == null) {
+            throw new IllegalStateException("unitPrice and quantity must not be null for OrderItem");
         }
+        this.lineTotal = unitPrice.multiply(BigDecimal.valueOf(quantity));
     }
 }

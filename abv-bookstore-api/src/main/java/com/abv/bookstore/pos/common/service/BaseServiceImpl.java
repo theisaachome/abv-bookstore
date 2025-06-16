@@ -4,15 +4,15 @@ import com.abv.bookstore.pos.common.BaseRepository;
 import com.abv.bookstore.pos.common.exception.ResourceNotFoundException;
 import com.abv.bookstore.pos.common.mapper.BaseMapper;
 
-public class BaseServiceImpl <Req,Res,ID,Entity> implements BaseService<Req,Res,ID> {
+public class BaseServiceImpl <NewReq,Res,ID,Entity> implements BaseService<NewReq,Res,ID> {
 
     protected final BaseRepository<Entity,ID> repository;
-    protected final BaseMapper<Req,Res,Entity> baseMapper;
+    protected final BaseMapper<NewReq,Res,Entity> baseMapper;
     private Class<Entity> entityClass;
     private Class<Res> resourceClass;
 
     public BaseServiceImpl(BaseRepository<Entity, ID> repository,
-                           BaseMapper<Req, Res, Entity> baseMapper,
+                           BaseMapper<NewReq, Res, Entity> baseMapper,
                            Class<Entity> entityClass, Class<Res> resourceClass) {
         this.repository = repository;
         this.baseMapper = baseMapper;
@@ -21,7 +21,7 @@ public class BaseServiceImpl <Req,Res,ID,Entity> implements BaseService<Req,Res,
     }
 
     @Override
-    public Res create(Req request) {
+    public Res create(NewReq request) {
         var entity = baseMapper.mapToEntity(request);
         var saved =repository.save(entity);
         return  baseMapper.mapToResponseDTO(saved);
@@ -35,11 +35,11 @@ public class BaseServiceImpl <Req,Res,ID,Entity> implements BaseService<Req,Res,
     }
 
     @Override
-    public Res update(ID id, Req request) {
+    public Res update(ID id, NewReq request) {
         var entity = repository.findById(id).orElseThrow(
                 ()-> new ResourceNotFoundException("Resource","ID", (Long) id));
-        baseMapper.updateEntity(request, entity);
-        return baseMapper.mapToResponseDTO(repository.save(entity));
+       var updated = baseMapper.updateEntity(request, entity);
+        return baseMapper.mapToResponseDTO(repository.save(updated));
     }
 
     @Override

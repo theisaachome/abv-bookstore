@@ -3,11 +3,10 @@ import com.abv.bookstore.pos.common.controller.BaseController;
 import com.abv.bookstore.pos.modules.orders.dt.OrderRequestDTO;
 import com.abv.bookstore.pos.modules.orders.dt.OrderResponseDTO;
 import com.abv.bookstore.pos.modules.orders.service.OrderService;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/vi/pos/sales")
+@RequestMapping("/api/v1/pos/sales")
 public class PosSaleController extends BaseController<OrderRequestDTO, OrderResponseDTO,Long> {
     private final OrderService orderService;
 

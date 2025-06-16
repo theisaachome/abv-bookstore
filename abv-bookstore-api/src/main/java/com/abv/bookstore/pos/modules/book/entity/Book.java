@@ -4,6 +4,7 @@ import com.abv.bookstore.pos.modules.stock.entity.StockMovement;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -39,10 +40,10 @@ public class Book extends BaseEntity {
     private String sku; // Unique code or SKU for the book
 
     @OneToMany(mappedBy = "book",cascade = CascadeType.ALL)
-    private List<StockMovement> stockMovements = new ArrayList<>();
+    private Set<StockMovement> stockMovements = new HashSet<>();
 
     @OneToMany(mappedBy = "book",cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BookPrice> prices= new ArrayList<>();
+    private Set<BookPrice> prices= new HashSet<>();
 
     public Optional<BookPrice> getCurrentPrice() {
         ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);

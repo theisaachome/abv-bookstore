@@ -1,6 +1,12 @@
-package com.abv.bookstore.pos.modules.management;
+package com.abv.bookstore.pos.modules.admin;
 
-public class BookPriceManagmentController {
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/v1/admin/books/book-prices")
+public class BookPriceController {
+    // add/edit/delete book prices
 }
 
 /*
@@ -17,7 +23,7 @@ public class BookPriceManagmentController {
 ✅ What Book Price Operations You Typically Need
 Here are basic and necessary operations for real-world book pricing logic:
 
-        1. Add New Price
+1. Add New Price
 Already implemented — good.
 
 But consider renaming the endpoint to:

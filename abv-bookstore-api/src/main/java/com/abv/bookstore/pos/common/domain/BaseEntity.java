@@ -17,6 +17,19 @@ public abstract class BaseEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     protected Long id;
 
+//    @Id
+//    @GeneratedValue(
+//            strategy = GenerationType.SEQUENCE,
+//            generator = "global_seq"
+//    )
+//    @SequenceGenerator(
+//            name = "global_seq",
+//            sequenceName = "global_seq",
+//            allocationSize = 20
+//    )
+//    protected Long id;
+
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     protected ZonedDateTime createdAt;
@@ -24,5 +37,7 @@ public abstract class BaseEntity {
     @UpdateTimestamp
     @Column(name = "updated_at", columnDefinition = "TIMESTAMP WITH TIME ZONE")
     protected ZonedDateTime updatedAt;
+    @Column(name = "active")
+    protected  boolean active=true;
 
 }
