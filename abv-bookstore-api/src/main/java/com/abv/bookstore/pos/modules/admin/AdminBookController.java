@@ -36,13 +36,8 @@ public class AdminBookController extends BaseController<BookReq, BookRes,Long>{
                 .body(ResponseHelper.respondPage(paginatedResults,"Books fetched"));
     }
 
-    @PostMapping("/{bookId}/prices")
-    public ResponseEntity<ApiResponse<BookPriceResponse>> addPromotionPrice(@PathVariable("bookId")Long bookId,
-                                                                            @RequestBody @Valid BookPriceRequest request){
-        var result = bookService.addBookPrice(bookId,request);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse<>("new book price has been added successfully.",result));
-    }
+
+
 }
 /*
 POST /admin/books                → create a book

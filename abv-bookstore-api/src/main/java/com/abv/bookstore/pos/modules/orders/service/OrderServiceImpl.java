@@ -102,8 +102,6 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderRequestDTO, OrderResp
 
         BigDecimal totalAmount = subtotal.add(taxAmount).subtract(discountAmount);
         order.setTotalAmount(totalAmount);
-        order.setCreatedAt(ZonedDateTime.now());
-        order.setUpdatedAt(ZonedDateTime.now());
 
         Order savedOrder;
         try {

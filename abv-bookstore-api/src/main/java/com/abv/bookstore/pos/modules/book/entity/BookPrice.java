@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @Getter
@@ -27,9 +28,15 @@ public class BookPrice extends BaseEntity {
     private Book book;
 
     @Column(nullable = false,name = "start_date")
-    private ZonedDateTime startDate;
+    private LocalDateTime startDate;
     @Column(name = "end_date")
-    private ZonedDateTime endDate;
+    private LocalDateTime endDate;
+
+    @Column(nullable = false)
+    private boolean deleted = Boolean.FALSE;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false,name = "book_price_status")
+    private BookPriceStatus bookPriceStatus = BookPriceStatus.ACTIVE;
 
     @Override
     public int hashCode() {

@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @MappedSuperclass
@@ -32,11 +33,11 @@ public abstract class BaseEntity {
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
-    protected ZonedDateTime createdAt;
+    protected LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", columnDefinition = "TIMESTAMP WITH TIME ZONE")
-    protected ZonedDateTime updatedAt;
+    protected LocalDateTime updatedAt;
     @Column(name = "active")
     protected  boolean active=true;
 

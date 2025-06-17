@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
 
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -46,7 +47,7 @@ public class Book extends BaseEntity {
     private Set<BookPrice> prices= new HashSet<>();
 
     public Optional<BookPrice> getCurrentPrice() {
-        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         return prices.stream()
                 .filter(p -> (p.getStartDate() == null || !now.isBefore(p.getStartDate()))
                         &&

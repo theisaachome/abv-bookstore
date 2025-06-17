@@ -1,13 +1,65 @@
 package com.abv.bookstore.pos.modules.admin;
+import com.abv.bookstore.pos.common.domain.ApiResponse;
+import com.abv.bookstore.pos.common.domain.PageResponse;
+import com.abv.bookstore.pos.modules.book.dto.BookPriceReq;
+import com.abv.bookstore.pos.modules.book.dto.BookPriceRes;
+import com.abv.bookstore.pos.modules.book.service.BookPriceService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+
 
 @RestController
-@RequestMapping("/api/v1/admin/books/book-prices")
+@RequestMapping("/api/v1/admin/books/")
 public class BookPriceController {
     // add/edit/delete book prices
+
+    private final BookPriceService bookPriceService;
+
+    public BookPriceController(BookPriceService bookPriceService) {
+        this.bookPriceService = bookPriceService;
+    }
+
+    //`POST /books/{bookId}/prices`
+    @PostMapping("/{bookId}/prices")
+    public ResponseEntity<ApiResponse<BookPriceRes>> addBookPrices(@PathVariable("bookId")Long bookId,
+                                                                       @RequestBody @Valid BookPriceReq request){
+        var result = bookPriceService.addBookPrice(bookId,request);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse<>("new book price has been added successfully.",result));
+    }
+    @PutMapping("/{bookId}/prices/{priceId}")
+    public ResponseEntity<ApiResponse<BookPriceRes>> updateBookPrice(
+            @PathVariable("bookId") Long bookId,@PathVariable("priceId") Long priceId ,
+            @RequestBody @Valid BookPriceReq request
+    ){
+        var result = bookPriceService.updateBookPrice(bookId,priceId,request);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse<>("new book price has been added successfully.",result));
+    }
+    @DeleteMapping("/{bookId}/prices/{priceId}")
+    public ResponseEntity<ApiResponse<String>> deleteBookPrice(@PathVariable("bookId")Long bookId,
+                                                  @PathVariable("priceId") Long priceId){
+        var result = bookPriceService.deleteBookPrice(bookId,priceId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse<>("book price has been deleted successfully.",result));
+    }
+
+
+
+    @GetMapping("/{bookId}/prices")
+    public ResponseEntity<ApiResponse<List<BookPriceRes>>> getBookPrices(@PathVariable("bookId") Long bookId){
+         var result = bookPriceService.getHistoricalPrice(bookId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse<>("Fetched Book Prices",result));
+    }
+
 }
+
+
 
 /*
 
@@ -38,7 +90,7 @@ json
         Copy
 Edit
 {
-    "priceType": "PROMOTION",
+        "priceType": "PROMOTION",
         "price": 25.99,
         "startAt": "...",
         "endAt": "..."

@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
@@ -51,7 +52,7 @@ public class BookServiceImpl extends BaseServiceImpl<BookReq, BookRes,Long, Book
        // manage book-prices
         var bookPrice = new BookPrice();
         bookPrice.setPrice(new BigDecimal(String.valueOf(request.price())));
-        bookPrice.setStartDate(ZonedDateTime.now(ZoneOffset.UTC));
+        bookPrice.setStartDate(LocalDateTime.now(ZoneOffset.UTC));
         bookPrice.setEndDate(null); // no expiry
         bookPrice.setBook(savedEntity);
 
@@ -110,23 +111,5 @@ public class BookServiceImpl extends BaseServiceImpl<BookReq, BookRes,Long, Book
         return bookPages.map(bookMapper::mapToSellerBookDTO);
     }
 
-    @Override
-    public BookPriceResponse addBookPrice(Long bookId,BookPriceRequest request) {
-        // check for book to add price
-        var book = repository.findById(bookId).orElseThrow(()->new ResourceNotFoundException("No book fond"));
 
-        var bookPrice = new BookPrice();
-        bookPrice.setPriceType(request.priceType());
-        bookPrice.setPrice(request.price());
-        bookPrice.setStartDate(request.startDate());
-        bookPrice.setEndDate(request.endDate());
-        bookPrice.setBook(book);
-        book.addPrice(bookPrice); // optional
-
-        var saveBookPrice =bookPriceRepository.save(bookPrice);
-        return new BookPriceResponse(saveBookPrice.getId(),saveBookPrice.getStartDate(),
-                saveBookPrice.getEndDate(),
-                saveBookPrice.getPriceType(),
-                bookPrice.getPriceType()+" has been added");
-    }
 }
