@@ -22,9 +22,8 @@ public class BookMapper implements BaseMapper<BookReq, BookRes, Book> {
         book.setSlug(SlugGenerator.toSlug(request.title()));
         book.setDescription(request.description());
         book.setLongDescription(request.longDescription());
-        book.setAuthor(request.author());
         book.setSku(AppCodeGenerator.generateSku());
-        book.setPublisher("AVG");
+        book.setPublisher(request.publisher());
         book.setIsbn(request.isbn());
         return book;
     }
@@ -43,7 +42,6 @@ public class BookMapper implements BaseMapper<BookReq, BookRes, Book> {
         existingBook.setPublisher(request.publisher());
         existingBook.setDescription(request.description());
         existingBook.setLongDescription(request.longDescription());
-        existingBook.setAuthor(request.author());
         existingBook.setIsbn(request.isbn());
         return existingBook;
     }
@@ -53,14 +51,14 @@ public class BookMapper implements BaseMapper<BookReq, BookRes, Book> {
                 book.getId(),
                 book.getTitle(),
                 book.getSku(),
-                book.getAuthor(),
+                book.getAuthor().getName(),
                 book.getIsbn(),null,1,"");
     }
     public BookInventoryDto mapToBookInventoryDto(Book book){
         var dto = new BookInventoryDto();
         dto.setId(book.getId());
         dto.setTitle(book.getTitle());
-        dto.setAuthor(book.getAuthor());
+        dto.setAuthor(book.getAuthor().getName());
         dto.setIsbn(book.getIsbn());
         dto.setSku(book.getSku());
         dto.setPublisher(book.getPublisher());

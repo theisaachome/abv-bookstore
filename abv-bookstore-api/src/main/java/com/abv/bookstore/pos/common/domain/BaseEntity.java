@@ -5,11 +5,17 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 public abstract class BaseEntity {
@@ -29,16 +35,24 @@ public abstract class BaseEntity {
 //            allocationSize = 20
 //    )
 //    protected Long id;
+@CreatedDate
+@Column(name = "created_at", updatable = false)
+private LocalDateTime createdAt;
 
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
-    protected LocalDateTime createdAt;
+    @CreatedBy
+    @Column(name = "created_by", updatable = false)
+    private String createdBy;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at", columnDefinition = "TIMESTAMP WITH TIME ZONE")
-    protected LocalDateTime updatedAt;
+    @LastModifiedBy
+    @Column(name = "updated_by")
+    private String updatedBy;
+
     @Column(name = "active")
-    protected  boolean active=true;
+    private boolean active = true;
+
 
 }

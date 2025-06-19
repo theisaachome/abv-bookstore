@@ -1,14 +1,13 @@
 package com.abv.bookstore.pos.modules.book.entity;
 import com.abv.bookstore.pos.common.domain.BaseEntity;
+import com.abv.bookstore.pos.modules.author.entity.Author;
 import com.abv.bookstore.pos.modules.stock.entity.StockMovement;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.*;
 
 @Getter
@@ -34,8 +33,10 @@ public class Book extends BaseEntity {
     @Column( length = 20,unique = true)
     private String isbn;
 
-    @Column(length = 255)
-    private String author; // If using `author_id`, remove this
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", nullable = false)
+    private Author author;
 
     @Column(length = 255,unique = true,nullable = false)
     private String sku; // Unique code or SKU for the book

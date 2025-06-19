@@ -1,10 +1,18 @@
 package com.abv.bookstore.pos.modules.stock.repo;
 
 import com.abv.bookstore.pos.common.BaseRepository;
+import com.abv.bookstore.pos.common.domain.StockMovementType;
+import com.abv.bookstore.pos.modules.stock.dto.StockMovementDtoView;
 import com.abv.bookstore.pos.modules.stock.entity.StockMovement;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public interface StockMovementRepository extends BaseRepository<StockMovement, Long> {
 //    @Query("""
@@ -18,4 +26,7 @@ public interface StockMovementRepository extends BaseRepository<StockMovement, L
       FROM StockMovement sm WHERE sm.book.id = :bookId
     """)
     int sumStockByBook(@Param("bookId") Long bookId);
+
+    @EntityGraph(attributePaths = {"book"})
+    Page<StockMovement> findAll(Specification spec, Pageable pageable);
 }

@@ -13,16 +13,13 @@ import com.abv.bookstore.pos.modules.orders.entity.Order;
 import com.abv.bookstore.pos.modules.orders.entity.OrderItem;
 import com.abv.bookstore.pos.modules.orders.mapper.OrderMapper;
 import com.abv.bookstore.pos.modules.orders.repos.OrderRepository;
-import com.abv.bookstore.pos.modules.stock.dto.BookStockUpdateRequest;
-import com.abv.bookstore.pos.modules.stock.entity.StockMovement;
-import com.abv.bookstore.pos.modules.stock.repo.StockMovementRepository;
+import com.abv.bookstore.pos.modules.stock.dto.StockMovementDto;
 import com.abv.bookstore.pos.modules.stock.service.StockService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -74,14 +71,9 @@ public class OrderServiceImpl extends BaseServiceImpl<OrderRequestDTO, OrderResp
             order.addOrderItem(orderItem);
 
             subtotal = subtotal.add(orderItem.getUnitPrice().multiply(BigDecimal.valueOf(itemDTO.quantity())));
-//            stockMovementRepository.save(stockMovement);
-            stockService.updateBookStock(
-                    new BookStockUpdateRequest(
-                            book.getId(),
-                            StockMovementType.INBOUND,
-                            itemDTO.quantity(),
-                            StockTypeReason.SOLD_OUT
-                            ));
+
+            var bookStockMovement = new StockMovementDto(book.getId(),StockMovementType.OUTBOUND, itemDTO.quantity(),StockTypeReason.SOLD_OUT);
+            stockService.updateBookStock(bookStockMovement);
         }
 
         // Calculate totals

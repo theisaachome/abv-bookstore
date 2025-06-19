@@ -2,6 +2,7 @@ package com.abv.bookstore.pos.common.service;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +45,15 @@ public class BaseSpecification<T> implements Specification<T> {
                     break;
                 case OR:
                     orPredicates.add(cb.like(cb.lower(path), "%" + criteria.getValue().toString().toLowerCase() + "%"));
+                    break;
+                case GREATER_THAN_EQUAL:
+                    predicates.add(cb.greaterThanOrEqualTo(path.as(LocalDate.class), (LocalDate)criteria.getValue()));
+                    break;
+                case LESS_THAN_EQUAL:
+                    predicates.add(cb.lessThanOrEqualTo(path.as(LocalDate.class), (LocalDate) criteria.getValue()));
+                    break;
+                case BETWEEN:
+                    predicates.add(cb.between(path.as(LocalDate.class), (LocalDate) criteria.getValue(), (LocalDate) criteria.getValueTo()));
                     break;
             }
         }
