@@ -10,6 +10,7 @@ public record AuthorDto(
         @NotBlank(message = "Author name is required.")
         @Size(max = 255, message = "Author name must not exceed 255 characters.")
         String authorName,
+        String authorCode,
 
         @Size(max = 255, message = "Slug must not exceed 255 characters.")
         String slug,

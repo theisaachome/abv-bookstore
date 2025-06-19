@@ -7,6 +7,7 @@ import com.abv.bookstore.pos.common.util.AppCodeGenerator;
 import com.abv.bookstore.pos.common.util.StockTypeReason;
 import com.abv.bookstore.pos.common.domain.StockMovementType;
 import com.abv.bookstore.pos.common.service.BaseServiceImpl;
+import com.abv.bookstore.pos.modules.author.entity.Author;
 import com.abv.bookstore.pos.modules.book.dto.*;
 import com.abv.bookstore.pos.modules.book.entity.Book;
 import com.abv.bookstore.pos.modules.book.entity.BookPrice;
@@ -44,9 +45,9 @@ public class BookServiceImpl extends BaseServiceImpl<BookReq, BookRes,Long, Book
     @Override
     public BookRes create(BookReq request) {
         var bookEntity = baseMapper.mapToEntity(request);
-
         //  Save book first for ID (if it's a new book)
        var savedEntity=  repository.save(bookEntity);
+       // insert book-author
        createInitialPrice(savedEntity,request.price());
        createInitialStock(savedEntity, request.stockQuantity());
         return baseMapper.mapToResponseDTO(savedEntity);
@@ -92,6 +93,9 @@ public class BookServiceImpl extends BaseServiceImpl<BookReq, BookRes,Long, Book
     }
 
 
+    private void createInitialBookAuthor(Book book){
+
+    }
     private void  createInitialPrice(Book book,BigDecimal price){
         // manage book-prices
         var bookPrice = new BookPrice();

@@ -17,7 +17,7 @@ public class AppCodeGenerator {
     private static final String PREFIX = "BOOK";
     private static final String ORDER_PREFIX = "ORD";
     private static final String STOCK_PREFIX = "STK";
-    private static final String A_PREFIX = "AUT";
+    private static final String AUTHOR_PREFIX = "ATH";
 
     public static String generateSku() {
         //  BOOK-20250519-5620
@@ -46,7 +46,7 @@ public class AppCodeGenerator {
         //  AUT-20250611-0001
         String dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
         String sequence = String.format("%04d", getNextSequenceNumber());
-        return STOCK_PREFIX + "-"+ dateStr + "-" + sequence;
+        return AUTHOR_PREFIX + "-"+ dateStr + "-" + sequence;
     }
 
     public static String toSlug(String title) {

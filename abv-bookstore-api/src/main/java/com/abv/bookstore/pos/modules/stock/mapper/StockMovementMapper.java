@@ -45,7 +45,7 @@ public class StockMovementMapper implements BaseMapper<StockMovementDto, StockMo
         var dto = new StockMovementDtoView(
                 entity.getId(),
                 entity.getBook().getTitle(),
-                entity.getBook().getAuthor(),
+                entity.getBook().getAuthor().getName(),
                 entity.getBook().getSku(),
                 entity.getStockMovementType(),
                 entity.getQuantity(),

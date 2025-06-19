@@ -5,6 +5,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 
 public interface BookRepository extends BaseRepository<Book, Long> {
 
@@ -27,5 +30,8 @@ public interface BookRepository extends BaseRepository<Book, Long> {
     @EntityGraph(attributePaths = {"prices", "stockMovements"})
     Page<Book> findAll(Specification<Book> spec, Pageable pageable);
 
+    @Query("SELECT b FROM Book b JOIN b.author a WHERE a.id = :authorId")
+    List<Book> findBooksByAuthorId(Long authorId);
+    
 
 }

@@ -6,17 +6,16 @@ import com.abv.bookstore.pos.common.domain.PageResponse;
 import com.abv.bookstore.pos.common.util.AppConstants;
 import com.abv.bookstore.pos.modules.book.dto.*;
 import com.abv.bookstore.pos.modules.book.service.BookService;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/admin/books")
-public class AdminBookController extends BaseController<BookReq, BookRes,Long>{
+public class BookController extends BaseController<BookReq, BookRes,Long>{
 
     private final BookService bookService;
-    public AdminBookController(BookService bookService) {
+    public BookController(BookService bookService) {
         super(bookService);
         this.bookService = bookService;
     }
